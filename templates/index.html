@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedPredict - Disease Classification System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #0d47a1;
+            --secondary: #f5f5f5;
+            --text: #202124;
+            --text-light: #5f6368;
+            --bg: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dadce0;
+            --success: #34a853;
+            --warning: #fbbc05;
+            --danger: #ea4335;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --primary: #8ab4f8;
+            --primary-dark: #5383ec;
+            --secondary: #202124;
+            --text: #e8eaed;
+            --text-light: #9aa0a6;
+            --bg: #121212;
+            --bg-secondary: #1e1e1e;
+            --card-bg: #1e1e1e;
+            --border: #5f6368;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--danger);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+        }
+
+        .user-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: white;
+            color: var(--primary);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Prediction Page Styles */
+        .user-details-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px var(--shadow);
+            margin-bottom: 25px;
+        }
+        
+        .user-details-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 1em;
+        }
+        
+        /* Added styles for result page */
+        .user-details-result {
+            background-color: rgba(26, 115, 232, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .prediction-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-size: 1rem;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .symptoms-container {
+            margin: 25px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+        }
+
+        .symptoms-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-light);
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-secondary);
+            padding: 10px 0;
+            z-index: 10;
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-btn {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .symptom-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .symptom-btn.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .selected-symptoms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            min-height: 50px;
+            padding: 15px;
+            background-color: var(--bg);
+            border-radius: 8px;
+        }
+
+        .symptom-tag {
+            background-color: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .symptom-tag i {
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .predict-btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+/* Result Actions - Fixed Version */
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+    width: 100%;
+    padding: 0 15px;
+}
+
+.btn-outline {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    padding: 14px 0;
+    margin: 0 auto;
+    border: 2px solid #007bff;
+    background-color: transparent;
+    color: #007bff;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-download {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Desktop View */
+@media (min-width: 768px) {
+    .result-actions {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: nowrap;
+        padding: 0;
+    }
+    
+    .btn-outline {
+        width: 180px;
+        margin: 0 8px;
+    }
+}
+
+/* Small Mobile Fix (under 350px) */
+@media (max-width: 350px) {
+    .btn-outline {
+        padding: 12px 0;
+        font-size: 0.95rem;
+    }
+}
+        /* Footer Styles */
+        footer {
+            background-color: var(--card-bg);
+            padding: 40px 20px 20px;
+            box-shadow: 0 -2px 10px var(--shadow);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-section p, .footer-section a {
+            color: var(--text-light);
+            margin-bottom: 10px;
+            text-decoration: none;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .result-container {
+                padding: 20px;
+            }
+            
+            .result-disease {
+                font-size: 2rem;
+            }
+            
+            .symptoms-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .result-actions {
+                flex-direction: column;
+            }
+            
+            .symptoms-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo" onclick="showPage('home')">
+                <i class="fas fa-heartbeat"></i>
+                <span>Med.Ai</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="#" onclick="showPage('home')">Home</a>
+                <a href="#" onclick="showPage('info')">Info</a>
+                <a href="#" onclick="showPage('details')">Details</a>
+                <a href="#" onclick="showPage('contact')">Contact</a>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-icon">P</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Page -->
+        <section id="home-page" class="page active">
+            <div class="hero">
+                <div class="logo" style="font-size: 3rem; margin-bottom: 20px;">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h1>Advanced Disease Prediction System By Prahallad</h1>
+                <p>Our AI-powered platform helps identify potential health conditions based on your symptoms, providing quick insights for better healthcare decisions.</p>
+                <button class="btn" onclick="showPage('prediction')">Predict Disease Now</button>
+            </div>
+            
+            <div class="vision-section">
+                <h2 style="text-align: center; margin-bottom: 30px;">Our Vision</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>Early Detection</h3>
+                        <p>We aim to identify potential health issues at their earliest stages, enabling proactive healthcare and better outcomes.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-globe"></i>
+                        <h3>Accessible Healthcare</h3>
+                        <p>Our mission is to make advanced medical insights available to everyone, regardless of location or economic status.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-brain"></i>
+                        <h3>AI-Powered Insights</h3>
+                        <p>Leveraging cutting-edge machine learning to provide accurate predictions based on medical research and data.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prediction Page -->
+        <section id="prediction-page" class="page">
+            <h2 style="margin-bottom: 20px;">Disease Prediction</h2>
+            <p style="margin-bottom: 30px; color: var(--text-light);">Select your symptoms from the list below or search for specific symptoms</p>
+            
+            <!-- Added user details form -->
+            <div class="user-details-container">
+                <h3 class="user-details-title">
+                    <i class="fas fa-user-circle"></i>
+                    Personal Information
+                </h3>
+                
+                <div class="user-details-grid">
+                    <div class="form-group">
+                        <label for="userName">Full Name</label>
+                        <input type="text" class="form-control" id="userName" placeholder="Enter your name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userAge">Age</label>
+                        <input type="number" class="form-control" id="userAge" placeholder="Enter your age" min="1" max="120">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group</label>
+                        <select class="form-control" id="bloodGroup">
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prediction-container">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="symptomSearch" placeholder="Search for symptoms...">
+                </div>
+                
+                <div class="symptoms-container">
+                    <div class="symptoms-title">All Symptoms (132):</div>
+                    <div class="symptoms-grid" id="symptomsGrid">
+                        <!-- Symptoms will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="symptoms-title">Selected Symptoms:</div>
+                    <div class="selected-symptoms" id="selectedSymptoms">
+                        <!-- Selected symptoms will appear here -->
+                    </div>
+                </div>
+                
+                <div class="predict-btn-container">
+                    <button class="btn btn-primary" id="predictBtn">Predict Disease</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Result Page -->
+        <section id="result-page" class="page">
+            <div class="result-container">
+                <div class="result-icon">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h2 class="result-title">Prediction Result</h2>
+                
+                <!-- Added user details in result -->
+                <div class="user-details-result" id="userDetailsResult">
+                    <div class="detail-item">
+                        <span class="detail-label">Name</span>
+                        <span class="detail-value" id="resultName">-</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">Age</span>
+                        <span class="detail-value" id="resultAge">-</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">Blood Group</span>
+                        <span class="detail-value" id="resultBloodGroup">-</span>
+                    </div>
+                </div>
+                
+                <p>Based on your symptoms, our system has identified the following potential condition:</p>
+                
+                <div class="result-disease" id="diseaseResult">Disease Name</div>
+                
+                <div class="result-description">
+                    <p id="diseaseDescription">Description will appear here...</p>
+                    <p id="diseaseRecommendation">Recommendations will appear here...</p>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="btn" onclick="showPage('prediction')">
+                        <i class="fas fa-arrow-left"></i> Back to Prediction
+                    </button>
+                    <button class="btn btn-primary" onclick="showPage('home')">
+                        <i class="fas fa-home"></i> Return to Home
+                    </button>
+                </div>
+                
+                <button id="downloadBtn" class="btn btn-outline">Download Report</button>
+            </div>
+
+        </section>
+
+        <!-- Info Page -->
+        <section id="info-page" class="page">
+            <h2>How Our System Works</h2>
+            <div class="prediction-container">
+                <div class="feature-card" style="box-shadow: none; padding: 0; margin-bottom: 30px;">
+                    <i class="fas fa-cogs" style="font-size: 3rem; text-align: center; display: block;"></i>
+                    <h3 style="text-align: center;">Advanced AI Technology</h3>
+                    <p>Our disease prediction system uses machine learning algorithms trained on thousands of medical cases to identify patterns and correlations between symptoms and diseases.</p>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px;">The Process</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">1</div>
+                        <h4>Symptom Collection</h4>
+                        <p>Users input their symptoms through our intuitive interface.</p>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">2</div>
+                        <h4>Data Analysis</h4>
+                        <p>Our system analyzes symptom combinations using trained models.</p>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">3</div>
+                        <h4>Prediction Generation</h4>
+                        <p>The system identifies the most likely conditions based on symptoms.</p>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+                        <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">4</div>
+                        <h4>Result Presentation</h4>
+                        <p>Users receive detailed information about potential conditions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Details Page -->
+        <section id="details-page" class="page">
+            <h2>Technical Details</h2>
+            <div class="prediction-container">
+                <h3>About Our Model</h3>
+                <p>Our disease prediction model was developed using state-of-the-art machine learning techniques and trained on a comprehensive dataset of medical symptoms and conditions.</p>
+                
+                <div style="margin: 30px 0; background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 15px;">Model Specifications</h4>
+                    <ul style="padding-left: 20px;">
+                        <li style="margin-bottom: 10px;"><strong>Algorithm:</strong> Random Forest Classifier</li>
+                        <li style="margin-bottom: 10px;"><strong>Training Data:</strong> 10,000+ medical cases</li>
+                        <li style="margin-bottom: 10px;"><strong>Features:</strong> 132 distinct symptoms</li>
+                        <li style="margin-bottom: 10px;"><strong>Accuracy:</strong> 92.4% on validation set</li>
+                        <li><strong>Diseases Covered:</strong> 40+ common conditions</li>
+                    </ul>
+                </div>
+                
+                <h3>Data Privacy</h3>
+                <p>We take your privacy seriously. All symptom data entered into our system is processed locally on your device and is never stored on our servers.</p>
+            </div>
+        </section>
+
+        <!-- Contact Page -->
+        <section id="contact-page" class="page">
+            <h2>Contact Us</h2>
+            <div class="prediction-container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                    <div>
+                        <h3>Get In Touch</h3>
+                        <p style="margin: 20px 0;">Have questions or feedback? We'd love to hear from you!</p>
+                        
+                        <div style="display: flex; gap: 15px; align-items: center; margin: 20px 0;">
+                            <div style="background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h4>Email</h4>
+                                <p>contact@MedAi.com</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; align-items: center; margin: 20px 0;">
+                            <div style="background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4>Location</h4>
+                                <p>Bhubneswar,Odisha</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3>Send a Message</h3>
+                        <form style="margin-top: 20px;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Name</label>
+                                <input type="text" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Email</label>
+                                <input type="email" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Message</label>
+                                <textarea style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); height: 150px;"></textarea>
+                            </div>
+                            
+                            <button class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Med.Ai</h3>
+                <p>Advanced disease prediction system using AI to help identify potential health conditions based on symptoms.</p>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/prahallad-nayak-9ab756290?"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/i_am_prahallad?igsh=MWc1djc5dDdxZW9heg=="><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com/@skchannel2611?si=kec1rjKIXylRLury"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#" onclick="showPage('home')">Home</a>
+                <a href="#" onclick="showPage('info')">How It Works</a>
+                <a href="#" onclick="showPage('prediction')">Predict Disease</a>
+                <a href="#" onclick="showPage('details')">Technical Details</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-user"></i> Prahallad Nayak</p>
+                <p><i class="fas fa-envelope"></i> prahalladnayak873@gmail.com</p>
+                <p><i class="fas fa-phone"></i> +91 8018333413</p>
+                <p><i class="fas fa-map-marker-alt"></i>Balasore,Odisha,India</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2025 Med.Ai  All rights reserved. Designed and Developed by Prahallad Nayak.
+        </div>
+    </footer>
+
+    <script>
+// All 132 symptoms from your Flask app
+const symptoms = [
+    'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing',
+    'shivering', 'chills', 'joint_pain', 'stomach_pain', 'acidity',
+    'ulcers_on_tongue', 'muscle_wasting', 'vomiting', 'burning_micturition',
+    'spotting_urination', 'fatigue', 'weight_gain', 'anxiety', 'cold_hands_and_feets',
+    'mood_swings', 'weight_loss', 'restlessness', 'lethargy', 'patches_in_throat',
+    'irregular_sugar_level', 'cough', 'high_fever', 'sunken_eyes', 'breathlessness',
+    'sweating', 'dehydration', 'indigestion', 'headache', 'yellowish_skin',
+    'dark_urine', 'nausea', 'loss_of_appetite', 'pain_behind_the_eyes',
+    'back_pain', 'constipation', 'abdominal_pain', 'diarrhoea',
+    'mild_fever', 'yellow_urine', 'yellowing_of_eyes', 'acute_liver_failure',
+    'fluid_overload', 'swelling_of_stomach', 'swelled_lymph_nodes', 'malaise',
+    'blurred_and_distorted_vision', 'phlegm', 'throat_irritation',
+    'redness_of_eyes', 'sinus_pressure', 'runny_nose', 'congestion',
+    'chest_pain', 'weakness_in_limbs', 'fast_heart_rate', 'pain_during_bowel_movements',
+    'pain_in_anal_region', 'bloody_stool', 'irritation_in_anus', 'neck_pain',
+    'dizziness', 'cramps', 'bruising', 'obesity', 'swollen_legs',
+    'swollen_blood_vessels', 'puffy_face_and_eyes', 'enlarged_thyroid',
+    'brittle_nails', 'swollen_extremeties', 'excessive_hunger', 'extra_marital_contacts',
+    'drying_and_tingling_lips', 'slurred_speech', 'knee_pain', 'hip_joint_pain',
+    'muscle_weakness', 'stiff_neck', 'swelling_joints', 'movement_stiffness',
+    'spinning_movements', 'loss_of_balance', 'unsteadiness', 'weakness_of_one_body_side',
+    'loss_of_smell', 'bladder_discomfort', 'foul_smell_of urine',
+    'continuous_feel_of_urine', 'passage_of_gases', 'internal_itching',
+    'toxic_look_(typhos)', 'depression', 'irritability', 'muscle_pain',
+    'altered_sensorium', 'red_spots_over_body', 'belly_pain', 'abnormal_menstruation',
+    'dischromic _patches', 'watering_from_eyes', 'increased_appetite',
+    'polyuria', 'family_history', 'mucoid_sputum', 'rusty_sputum',
+    'lack_of_concentration', 'visual_disturbances', 'receiving_blood_transfusion',
+    'receiving_unsterile_injections', 'coma', 'stomach_bleeding', 'distention_of_abdomen',
+    'history_of_alcohol_consumption', 'fluid_overload.1', 'blood_in_sputum',
+    'prominent_veins_on_calf', 'palpitations', 'painful_walking',
+    'pus_filled_pimples', 'blackheads', 'scurring', 'skin_peeling',
+    'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails',
+    'blister', 'red_sore_around_nose', 'yellow_crust_ooze'
+];
+
+// Disease information mapping
+const diseaseInfo = {
+    'Fungal infection': {
+        description: 'A fungal infection occurs when an invading fungus takes over an area of the body and is too much for the immune system to handle.',
+        recommendation: 'Consult a dermatologist for antifungal medications. Keep the affected area clean and dry.'
+    },
+    'Allergy': {
+        description: 'Allergies occur when your immune system reacts to a foreign substance that doesn\'t cause a reaction in most people.',
+        recommendation: 'Avoid known allergens. Use antihistamines or consult an allergist for immunotherapy.'
+    },
+    'GERD': {
+        description: 'Gastroesophageal reflux disease (GERD) is a chronic digestive disorder that occurs when stomach acid frequently flows back into the esophagus.',
+        recommendation: 'Avoid trigger foods, eat smaller meals, and elevate the head of your bed. Consult a gastroenterologist.'
+    },
+    'Chronic cholestasis': {
+        description: 'A condition where bile cannot flow from the liver to the duodenum, leading to bile accumulation in the liver.',
+        recommendation: 'Consult a hepatologist for proper diagnosis and management. Treatment may include medications or surgery.'
+    },
+    'Drug Reaction': {
+        description: 'An adverse reaction to a medication that can range from mild to life-threatening.',
+        recommendation: 'Discontinue the medication if possible and consult your healthcare provider immediately.'
+    },
+    'Peptic ulcer disease': {
+        description: 'Sores that develop on the lining of the stomach, upper small intestine or esophagus.',
+        recommendation: 'Avoid NSAIDs, alcohol, and smoking. Take prescribed medications and follow a balanced diet.'
+    },
+    'AIDS': {
+        description: 'Acquired Immunodeficiency Syndrome is a chronic, potentially life-threatening condition caused by the human immunodeficiency virus (HIV).',
+        recommendation: 'Seek immediate medical care for antiretroviral therapy and regular monitoring.'
+    },
+    'Diabetes': {
+        description: 'A chronic disease that occurs when the pancreas does not produce enough insulin or when the body cannot effectively use the insulin it produces.',
+        recommendation: 'Monitor blood sugar regularly, follow a diabetic diet, exercise, and take medications as prescribed.'
+    },
+    'Gastroenteritis': {
+        description: 'Inflammation of the stomach and intestines, typically resulting from bacterial toxins or viral infection.',
+        recommendation: 'Stay hydrated, follow the BRAT diet (bananas, rice, applesauce, toast), and rest.'
+    },
+    'Bronchial Asthma': {
+        description: 'A condition in which your airways narrow and swell and may produce extra mucus, making breathing difficult.',
+        recommendation: 'Use prescribed inhalers, avoid triggers, and have an asthma action plan.'
+    },
+    'Hypertension': {
+        description: 'High blood pressure is a common condition where the long-term force of blood against artery walls is high enough to cause health problems.',
+        recommendation: 'Monitor blood pressure regularly, reduce sodium intake, exercise, and take prescribed medications.'
+    },
+    'Migraine': {
+        description: 'A neurological condition characterized by intense, debilitating headaches often accompanied by nausea, vomiting, and sensitivity to light and sound.',
+        recommendation: 'Identify and avoid triggers, rest in a quiet, dark room, and take prescribed medications.'
+    },
+    'Cervical spondylosis': {
+        description: 'A general term for age-related wear and tear affecting the spinal disks in your neck.',
+        recommendation: 'Practice good posture, do neck exercises, use a supportive pillow, and consider physical therapy.'
+    },
+    'Paralysis (brain hemorrhage)': {
+        description: 'Loss of muscle function in part of your body due to bleeding in the brain.',
+        recommendation: 'Seek emergency medical care immediately. Rehabilitation therapy is crucial for recovery.'
+    },
+    'Jaundice': {
+        description: 'A condition in which the skin, whites of the eyes and mucous membranes turn yellow due to high bilirubin levels.',
+        recommendation: 'Consult a healthcare provider to determine the underlying cause and appropriate treatment.'
+    },
+    'Malaria': {
+        description: 'A life-threatening mosquito-borne blood disease caused by a Plasmodium parasite.',
+        recommendation: 'Seek immediate medical attention. Prevent mosquito bites and take antimalarial drugs if traveling to endemic areas.'
+    },
+    'Chicken pox': {
+        description: 'A highly contagious viral infection causing an itchy, blister-like rash on the skin.',
+        recommendation: 'Get plenty of rest, use calamine lotion for itching, and stay home until all blisters have crusted over.'
+    },
+    'Dengue': {
+        description: 'A mosquito-borne viral infection causing flu-like illness that can develop into severe dengue.',
+        recommendation: 'Rest, stay hydrated, and seek medical care immediately if symptoms worsen.'
+    },
+    'Typhoid': {
+        description: 'A bacterial infection caused by Salmonella typhi that spreads through contaminated food and water.',
+        recommendation: 'Seek medical care for antibiotics. Practice good hygiene and food safety.'
+    },
+    'Hepatitis A': {
+        description: 'A highly contagious liver infection caused by the hepatitis A virus.',
+        recommendation: 'Get vaccinated, rest, stay hydrated, and avoid alcohol. Most people recover without treatment.'
+    },
+    'Hepatitis B': {
+        description: 'A serious liver infection caused by the hepatitis B virus that can become chronic.',
+        recommendation: 'Get vaccinated, avoid alcohol, and consult a healthcare provider for antiviral medications if needed.'
+    },
+    'Hepatitis C': {
+        description: 'A viral infection that causes liver inflammation, sometimes leading to serious liver damage.',
+        recommendation: 'Consult a healthcare provider for antiviral medications. Avoid alcohol and get vaccinated against hepatitis A and B.'
+    },
+    'Hepatitis D': {
+        description: 'A serious liver disease caused by infection with the hepatitis D virus that only occurs in people infected with hepatitis B.',
+        recommendation: 'Consult a hepatologist for specialized care. Prevention involves hepatitis B vaccination.'
+    },
+    'Hepatitis E': {
+        description: 'A liver disease caused by the hepatitis E virus that usually results in an acute infection.',
+        recommendation: 'Rest, stay hydrated, and avoid alcohol. Most people recover without treatment.'
+    },
+    'Alcoholic hepatitis': {
+        description: 'Liver inflammation caused by excessive alcohol consumption over time.',
+        recommendation: 'Stop drinking alcohol immediately. Seek medical care for supportive treatment.'
+    },
+    'Tuberculosis': {
+        description: 'A potentially serious infectious bacterial disease that mainly affects the lungs.',
+        recommendation: 'Complete the full course of antibiotics as prescribed. Cover your mouth when coughing.'
+    },
+    'Common Cold': {
+        description: 'A viral infection of your upper respiratory tract — your nose and throat.',
+        recommendation: 'Rest, stay hydrated, and use over-the-counter cold remedies to relieve symptoms.'
+    },
+    'Pneumonia': {
+        description: 'An infection that inflames the air sacs in one or both lungs, which may fill with fluid.',
+        recommendation: 'Seek medical care for antibiotics if bacterial. Rest and stay hydrated.'
+    },
+    'Dimorphic hemorrhoids(piles)': {
+        description: 'Swollen and inflamed veins in the rectum and anus that cause discomfort and bleeding.',
+        recommendation: 'Increase fiber intake, drink plenty of water, and use over-the-counter creams for relief.'
+    },
+    'Heart attack': {
+        description: 'A blockage of blood flow to the heart muscle, often due to a blood clot.',
+        recommendation: 'Seek emergency medical care immediately. Call your local emergency number.'
+    },
+    'Varicose veins': {
+        description: 'Enlarged, twisted veins that most commonly occur in the legs.',
+        recommendation: 'Exercise regularly, elevate your legs, wear compression stockings, and avoid long periods of standing.'
+    },
+    'Hypothyroidism': {
+        description: 'A condition where the thyroid gland doesn\'t produce enough thyroid hormone.',
+        recommendation: 'Take prescribed thyroid hormone replacement medication regularly and have regular TSH tests.'
+    },
+    'Hyperthyroidism': {
+        description: 'A condition where the thyroid gland produces too much thyroid hormone.',
+        recommendation: 'Consult an endocrinologist for appropriate treatment which may include medication, radioactive iodine, or surgery.'
+    },
+    'Hypoglycemia': {
+        description: 'A condition characterized by abnormally low blood sugar levels.',
+        recommendation: 'Eat small, frequent meals, carry fast-acting sugar sources, and monitor blood sugar regularly.'
+    },
+    'Osteoarthritis': {
+        description: 'The most common form of arthritis, occurring when the protective cartilage at the ends of bones wears down over time.',
+        recommendation: 'Maintain a healthy weight, exercise regularly, and use pain relievers as needed.'
+    },
+    'Arthritis': {
+        description: 'Inflammation of one or more joints, causing pain and stiffness.',
+        recommendation: 'Exercise regularly, maintain a healthy weight, and use prescribed medications to manage symptoms.'
+    },
+    '(Vertigo) Paroxysmal Positional Vertigo': {
+        description: 'A sudden sensation of spinning, usually triggered by specific changes in head position.',
+        recommendation: 'Perform repositioning maneuvers like the Epley maneuver under professional guidance.'
+    },
+    'Acne': {
+        description: 'A skin condition that occurs when hair follicles become plugged with oil and dead skin cells.',
+        recommendation: 'Keep skin clean, avoid squeezing pimples, and use over-the-counter or prescription treatments.'
+    },
+    'Urinary tract infection': {
+        description: 'An infection in any part of the urinary system, most commonly the bladder and urethra.',
+        recommendation: 'Drink plenty of water, urinate frequently, and take prescribed antibiotics.'
+    },
+    'Psoriasis': {
+        description: 'A chronic autoimmune condition that causes rapid buildup of skin cells, leading to scaling on the skin\'s surface.',
+        recommendation: 'Moisturize regularly, avoid triggers, and use prescribed topical treatments or medications.'
+    },
+    'Impetigo': {
+        description: 'A highly contagious skin infection that mainly affects infants and children.',
+        recommendation: 'Keep skin clean, avoid scratching, and use prescribed antibiotic ointment or oral antibiotics.'
+    }
+};
+
+// Add this global variable to store the report ID
+let currentReportId = null;
+
+// Page navigation
+function showPage(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show selected page
+    document.getElementById(`${pageId}-page`).classList.add('active');
+    
+    // If showing prediction page, initialize symptoms
+    if (pageId === 'prediction') {
+        initSymptoms();
+    }
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+// Initialize symptoms on prediction page
+function initSymptoms() {
+    const symptomsGrid = document.getElementById('symptomsGrid');
+    symptomsGrid.innerHTML = '';
+    
+    symptoms.forEach(symptom => {
+        const formattedSymptom = symptom.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        
+        const button = document.createElement('button');
+        button.className = 'symptom-btn';
+        button.textContent = formattedSymptom;
+        button.dataset.original = symptom;
+        button.addEventListener('click', () => {
+            button.classList.toggle('selected');
+            updateSelectedSymptoms();
+        });
+        symptomsGrid.appendChild(button);
+    });
+    
+    document.getElementById('selectedSymptoms').innerHTML = '';
+}
+
+// Update selected symptoms display
+function updateSelectedSymptoms() {
+    const selectedContainer = document.getElementById('selectedSymptoms');
+    selectedContainer.innerHTML = '';
+    
+    document.querySelectorAll('.symptom-btn.selected').forEach(btn => {
+        const displayName = btn.textContent;
+        const originalName = btn.dataset.original;
+        
+        const tag = document.createElement('div');
+        tag.className = 'symptom-tag';
+        tag.innerHTML = `${displayName} <i class="fas fa-times" onclick="removeSymptom('${originalName}')"></i>`;
+        selectedContainer.appendChild(tag);
+    });
+}
+
+// Remove symptom from selected
+function removeSymptom(symptom) {
+    document.querySelectorAll('.symptom-btn').forEach(btn => {
+        if (btn.dataset.original === symptom) {
+            btn.classList.remove('selected');
+        }
+    });
+    updateSelectedSymptoms();
+}
+
+// Search functionality
+document.getElementById('symptomSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    
+    document.querySelectorAll('.symptom-btn').forEach(btn => {
+        const symptom = btn.textContent.toLowerCase();
+        if (symptom.includes(searchTerm)) {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+        }
+    });
+});
+
+// Predict button functionality - UPDATED
+document.getElementById('predictBtn').addEventListener('click', async () => {
+    const selectedBtns = document.querySelectorAll('.symptom-btn.selected');
+    if (selectedBtns.length === 0) {
+        alert('Please select at least one symptom');
+        return;
+    }
+    
+    // Get user details from form
+    const userName = document.getElementById('userName').value;
+    const userAge = document.getElementById('userAge').value;
+    const bloodGroup = document.getElementById('bloodGroup').value;
+    
+    // Validate user details
+    if (!userName || !userAge) {
+        alert('Please fill in all required personal information');
+        return;
+    }
+    
+    // Update user details in result page
+    document.getElementById('resultName').textContent = userName;
+    document.getElementById('resultAge').textContent = userAge;
+    document.getElementById('resultBloodGroup').textContent = bloodGroup || 'Not specified';
+    
+    // Collect selected symptoms
+    const selectedSymptoms = Array.from(selectedBtns).map(btn => btn.dataset.original);
+
+    try {
+        // Send to Flask
+        const resp = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                symptoms: selectedSymptoms,
+                userDetails: {
+                    name: userName,
+                    age: userAge,
+                    bloodGroup: bloodGroup
+                }
+            })
+        });
+        const data = await resp.json();
+
+        // Store the report ID for download
+        currentReportId = data.report_id;
+
+        // Update result page
+        document.getElementById('diseaseResult').textContent = data.prediction;
+        document.getElementById('diseaseDescription').innerHTML =
+            `<strong>Description:</strong> ${data.description}`;
+        document.getElementById('diseaseRecommendation').innerHTML =
+            `<strong>Recommended Action:</strong> ${data.recommendation}`;
+
+    } catch (err) {
+        console.error('Error fetching prediction:', err);
+        alert('Server error – please try again.');
+        return;
+    }
+
+    showPage('result');
+});
+
+// Download report functionality - FIXED
+document.getElementById('downloadBtn').addEventListener('click', () => {
+    if (!currentReportId) {
+        alert('No report available for download. Please make a prediction first.');
+        return;
+    }
+    
+    // Create temporary download link
+    const downloadLink = document.createElement('a');
+    downloadLink.href = `/download-report/${currentReportId}`;
+    downloadLink.style.display = 'none';
+    
+    // Add to document and trigger click
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    
+    // Clean up
+    document.body.removeChild(downloadLink);
+});
+
+// Theme toggle functionality
+document.getElementById('themeToggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const icon = document.querySelector('#themeToggle i');
+    
+    if (document.body.classList.contains('dark-mode')) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    }
+    
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+});
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+    // Initialize the prediction page symptoms
+    initSymptoms();
+    
+    // Apply saved theme preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('#themeToggle i').classList.remove('fa-moon');
+        document.querySelector('#themeToggle i').classList.add('fa-sun');
+    }
+});
+    </script>
+</body>
+</html>
